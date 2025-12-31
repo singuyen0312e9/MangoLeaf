@@ -1,0 +1,75 @@
+{
+    "Anthracnose": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 39.0
+    },
+    "Bacterial_Canker": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 40.0
+    },
+    "Bacterial_Spot": {
+        "precision": 0.975609756097561,
+        "recall": 1.0,
+        "f1-score": 0.9876543209876543,
+        "support": 40.0
+    },
+    "Cutting_Weevil": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 40.0
+    },
+    "Die_Back": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 41.0
+    },
+    "Gall_Midge": {
+        "precision": 1.0,
+        "recall": 0.95,
+        "f1-score": 0.9743589743589743,
+        "support": 40.0
+    },
+    "Healthy": {
+        "precision": 0.975609756097561,
+        "recall": 1.0,
+        "f1-score": 0.9876543209876543,
+        "support": 40.0
+    },
+    "Powdery_Mildew": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 40.0
+    },
+    "Sooty_Mould": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 40.0
+    },
+    "accuracy": 0.9944444444444445,
+    "macro avg": {
+        "precision": 0.994579945799458,
+        "recall": 0.9944444444444444,
+        "f1-score": 0.9944075129260315,
+        "support": 360.0
+    },
+    "weighted avg": {
+        "precision": 0.9945799457994581,
+        "recall": 0.9944444444444445,
+        "f1-score": 0.9944075129260316,
+        "support": 360.0
+    },
+    "regression_metrics": {
+        "mse": 0.027777777777777776,
+        "rmse": 0.16666666666666666,
+        "r2_score": 0.9958052909263782,
+        "accuracy": 0.9944444444444445
+    }
+}
