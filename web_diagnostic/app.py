@@ -1,4 +1,5 @@
 
+
 import os
 import torch
 import torch.nn as nn
@@ -6,83 +7,65 @@ from flask import Flask, request, jsonify, render_template
 from torchvision import models, transforms
 from PIL import Image
 import io
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 
-# --- 1. ĐỊNH NGHĨA KIẾN TRÚC SHUFFLENETV2 + CBAM (ATTENTION) ---
-# Module này phải khớp hoàn toàn với kiến trúc đã train trong Bước 8 & 9
-class ChannelAttention(nn.Module):
-    def __init__(self, in_planes, ratio=16):
-        super(ChannelAttention, self).__init__()
-        self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.max_pool = nn.AdaptiveMaxPool2d(1)
-        self.fc = nn.Sequential(
-            nn.Conv2d(in_planes, in_planes // ratio, 1, bias=False),
-            nn.ReLU(),
-            nn.Conv2d(in_planes // ratio, in_planes, 1, bias=False)
-        )
-        self.sigmoid = nn.Sigmoid()
-    def forward(self, x):
-        avg_out = self.fc(self.avg_pool(x))
-        max_out = self.fc(self.max_pool(x))
-        return self.sigmoid(avg_out + max_out)
 
-class SpatialAttention(nn.Module):
-    def __init__(self, kernel_size=7):
-        super(SpatialAttention, self).__init__()
-        self.conv = nn.Conv2d(2, 1, kernel_size, padding=kernel_size//2, bias=False)
-        self.sigmoid = nn.Sigmoid()
-    def forward(self, x):
-        avg_out = torch.mean(x, dim=1, keepdim=True)
-        max_out, _ = torch.max(x, dim=1, keepdim=True)
-        concat = torch.cat([avg_out, max_out], dim=1)
-        return self.sigmoid(self.conv(concat))
 
-class CBAMShuffleNetV2(nn.Module):
+
+# --- 1. ĐỊNH NGHĨA KIẾN TRÚC MOBILENETV2 CẢI TIẾN ---
+class EnhancedMobileNetV2(nn.Module):
     def __init__(self, num_classes):
-        super().__init__()
-        base = models.shufflenet_v2_x1_0(weights=None)
-        self.conv1 = base.conv1
-        self.maxpool = base.maxpool
-        self.stage2 = base.stage2
-        self.stage3 = base.stage3
-        self.stage4 = base.stage4
-        self.conv5 = base.conv5
-        self.ca = ChannelAttention(464) 
-        self.sa = SpatialAttention()
-        self.fc = nn.Sequential(
-            nn.Linear(1024, 512),
+        super(EnhancedMobileNetV2, self).__init__()
+        # Load backbone không weights để load từ file pth
+        self.backbone = models.mobilenet_v2(weights=None).features
+        
+        # Squeeze-and-Excitation Attention
+        self.attention = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Conv2d(1280, 80, kernel_size=1),
             nn.ReLU(),
-            nn.Dropout(0.3),
+            nn.Conv2d(80, 1280, kernel_size=1),
+            nn.Sigmoid()
+        )
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.classifier = nn.Sequential(
+            nn.Dropout(p=0.4),
+            nn.Linear(1280, 512),
+            nn.BatchNorm1d(512),
+            nn.ReLU(),
+            nn.Dropout(p=0.3),
             nn.Linear(512, num_classes)
         )
 
     def forward(self, x):
-        x = self.conv1(x); x = self.maxpool(x)
-        x = self.stage2(x); x = self.stage3(x)
-        x = self.stage4(x)
-        x = x * self.ca(x)
-        x = x * self.sa(x)
-        x = self.conv5(x)
-        x = x.mean([2, 3])
-        x = self.fc(x)
-        return x
+        x = self.backbone(x)
+        x = x * self.attention(x)
+        x = self.pool(x)
+        x = torch.flatten(x, 1)
+        return self.classifier(x)
+
+def load_enhanced_mbn(num_classes, model_path, device):
+    model = EnhancedMobileNetV2(num_classes)
+    if os.path.exists(model_path):
+        model.load_state_dict(torch.load(model_path, map_location=device))
+        print(f"[Success] Loaded Enhanced MobileNetV2 from {model_path}")
+    else:
+        print(f"[Error] Model not found at {model_path}")
+    model = model.to(device)
+    model.eval()
+    return model
 
 # --- 2. CẤU HÌNH MODEL ---
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 num_classes = 9
-model = CBAMShuffleNetV2(num_classes).to(DEVICE)
+MODEL_PATH = "../Result/MBN_Caitien/best_model.pth"
 
-# Path tới file model Attention mới nhất
-MODEL_PATH = "../Result/ShuffleNetV2_CBAM_Improved/best_shufflenet_cbam.pth"
+model = load_enhanced_mbn(num_classes, MODEL_PATH, DEVICE)
 
-if os.path.exists(MODEL_PATH):
-    model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
-    print(f"[Success] Loaded ShuffleNetV2 + CBAM Attention from {MODEL_PATH}")
-else:
-    print(f"[Error] Model not found at {MODEL_PATH}")
 
-model.eval()
 
 LABELS = [
     "Thán thư (Anthracnose)", 
@@ -102,12 +85,41 @@ transform = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-def center_crop_pillow(img):
-    w, h = img.size
-    s = min(w, h)
-    left = (w - s) / 2
-    top = (h - s) / 2
-    return img.crop((left, top, left + s, top + s))
+def leaf_focus_crop(img_pil):
+    """
+    Tự động tìm vùng có lá (màu xanh) và crop hình vuông quanh đó.
+    Dựa trên logic từ file rebuild_dataset_dedup.py.
+    """
+    # Chuyển từ PIL sang OpenCV
+    img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+    h_img, w_img = img.shape[:2]
+    
+    # Chuyển sang không gian màu HSV để lọc màu xanh lá
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, np.array([30, 40, 40]), np.array([90, 255, 255]))
+    
+    # Tìm các đường bao (contours) của vùng màu xanh
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    s = min(h_img, w_img)
+    
+    if contours:
+        # Lấy contour có diện tích lớn nhất (lá rõ nhất)
+        c = max(contours, key=cv2.contourArea)
+        x, y, w, h_rect = cv2.boundingRect(c)
+        cx, cy = x + w // 2, y + h_rect // 2
+        
+        # Tính toán tọa độ crop hình vuông s x s quanh tâm cx, cy
+        x1 = max(0, min(cx - s // 2, w_img - s))
+        y1 = max(0, min(cy - s // 2, h_img - s))
+        cropped = img[y1:y1+s, x1:x1+s]
+    else:
+        # Nếu không tìm thấy màu xanh, thực hiện center crop như cũ
+        x1, y1 = (w_img - s) // 2, (h_img - s) // 2
+        cropped = img[y1:y1+s, x1:x1+s]
+    
+    # Chuyển ngược lại PIL RGB
+    return Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
 
 @app.route('/')
 def index():
@@ -122,7 +134,7 @@ def predict():
     img_bytes = file.read()
     img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
     
-    img = center_crop_pillow(img)
+    img = leaf_focus_crop(img)
     img_tensor = transform(img).unsqueeze(0).to(DEVICE)
     
     with torch.no_grad():
@@ -138,5 +150,6 @@ def predict():
 
 if __name__ == '__main__':
     os.makedirs('templates', exist_ok=True)
-    print(f"Server is running with ATTENTION MODEL on {DEVICE}...")
+    print(f"Server is running with ENHANCED MOBILENETV2 on {DEVICE}...")
     app.run(debug=True, port=5000)
+

@@ -1,75 +1,69 @@
 {
     "Anthracnose": {
-        "precision": 0.9459459459459459,
-        "recall": 0.8974358974358975,
-        "f1-score": 0.9210526315789473,
+        "precision": 0.9142857142857143,
+        "recall": 0.8205128205128205,
+        "f1-score": 0.8648648648648649,
         "support": 39.0
     },
     "Bacterial_Canker": {
-        "precision": 0.9487179487179487,
-        "recall": 0.925,
-        "f1-score": 0.9367088607594937,
+        "precision": 0.8918918918918919,
+        "recall": 0.825,
+        "f1-score": 0.8571428571428571,
         "support": 40.0
     },
     "Bacterial_Spot": {
-        "precision": 0.9069767441860465,
-        "recall": 0.975,
-        "f1-score": 0.9397590361445783,
+        "precision": 0.9047619047619048,
+        "recall": 0.95,
+        "f1-score": 0.926829268292683,
         "support": 40.0
     },
     "Cutting_Weevil": {
         "precision": 1.0,
-        "recall": 0.95,
-        "f1-score": 0.9743589743589743,
+        "recall": 1.0,
+        "f1-score": 1.0,
         "support": 40.0
     },
     "Die_Back": {
-        "precision": 1.0,
+        "precision": 0.8913043478260869,
         "recall": 1.0,
-        "f1-score": 1.0,
+        "f1-score": 0.9425287356321839,
         "support": 41.0
     },
     "Gall_Midge": {
-        "precision": 0.7368421052631579,
-        "recall": 0.7,
-        "f1-score": 0.717948717948718,
+        "precision": 0.896551724137931,
+        "recall": 0.65,
+        "f1-score": 0.7536231884057971,
         "support": 40.0
     },
     "Healthy": {
-        "precision": 0.8837209302325582,
-        "recall": 0.95,
-        "f1-score": 0.9156626506024096,
+        "precision": 0.8478260869565217,
+        "recall": 0.975,
+        "f1-score": 0.9069767441860465,
         "support": 40.0
     },
     "Powdery_Mildew": {
-        "precision": 0.813953488372093,
+        "precision": 0.8333333333333334,
         "recall": 0.875,
-        "f1-score": 0.8433734939759037,
+        "f1-score": 0.8536585365853658,
         "support": 40.0
     },
     "Sooty_Mould": {
-        "precision": 0.8421052631578947,
-        "recall": 0.8,
-        "f1-score": 0.8205128205128205,
+        "precision": 0.8372093023255814,
+        "recall": 0.9,
+        "f1-score": 0.8674698795180723,
         "support": 40.0
     },
-    "accuracy": 0.8972222222222223,
+    "accuracy": 0.8888888888888888,
     "macro avg": {
-        "precision": 0.8975847139861828,
-        "recall": 0.896937321937322,
-        "f1-score": 0.8965974650979829,
+        "precision": 0.8907960339465517,
+        "recall": 0.8883903133903135,
+        "f1-score": 0.8858993416253189,
         "support": 360.0
     },
     "weighted avg": {
-        "precision": 0.8977348641363329,
-        "recall": 0.8972222222222223,
-        "f1-score": 0.8968167633435968,
+        "precision": 0.8907321968174973,
+        "recall": 0.8888888888888888,
+        "f1-score": 0.8861150745996724,
         "support": 360.0
-    },
-    "regression_metrics": {
-        "mse": 1.6222222222222222,
-        "rmse": 1.2736648783028532,
-        "r2_score": 0.7550289901004866,
-        "accuracy": 0.8972222222222223
     }
 }

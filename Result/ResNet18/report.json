@@ -12,9 +12,9 @@
         "support": 40.0
     },
     "Bacterial_Spot": {
-        "precision": 0.975609756097561,
-        "recall": 1.0,
-        "f1-score": 0.9876543209876543,
+        "precision": 1.0,
+        "recall": 0.975,
+        "f1-score": 0.9873417721518988,
         "support": 40.0
     },
     "Cutting_Weevil": {
@@ -30,9 +30,9 @@
         "support": 41.0
     },
     "Gall_Midge": {
-        "precision": 1.0,
-        "recall": 0.975,
-        "f1-score": 0.9873417721518988,
+        "precision": 0.975609756097561,
+        "recall": 1.0,
+        "f1-score": 0.9876543209876543,
         "support": 40.0
     },
     "Healthy": {
@@ -65,11 +65,5 @@
         "recall": 0.9972222222222222,
         "f1-score": 0.9972217881266171,
         "support": 360.0
-    },
-    "regression_metrics": {
-        "mse": 0.025,
-        "rmse": 0.15811388300841897,
-        "r2_score": 0.9962247618337404,
-        "accuracy": 0.9972222222222222
     }
 }

@@ -1,8 +1,8 @@
 {
     "Anthracnose": {
         "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "recall": 0.9743589743589743,
+        "f1-score": 0.987012987012987,
         "support": 39.0
     },
     "Bacterial_Canker": {
@@ -12,9 +12,9 @@
         "support": 40.0
     },
     "Bacterial_Spot": {
-        "precision": 0.975609756097561,
+        "precision": 0.9523809523809523,
         "recall": 1.0,
-        "f1-score": 0.9876543209876543,
+        "f1-score": 0.975609756097561,
         "support": 40.0
     },
     "Cutting_Weevil": {
@@ -30,9 +30,9 @@
         "support": 41.0
     },
     "Gall_Midge": {
-        "precision": 1.0,
-        "recall": 0.975,
-        "f1-score": 0.9873417721518988,
+        "precision": 0.9743589743589743,
+        "recall": 0.95,
+        "f1-score": 0.9620253164556962,
         "support": 40.0
     },
     "Healthy": {
@@ -43,33 +43,27 @@
     },
     "Powdery_Mildew": {
         "precision": 1.0,
-        "recall": 1.0,
-        "f1-score": 1.0,
+        "recall": 0.975,
+        "f1-score": 0.9873417721518988,
         "support": 40.0
     },
     "Sooty_Mould": {
-        "precision": 1.0,
+        "precision": 0.975609756097561,
         "recall": 1.0,
-        "f1-score": 1.0,
+        "f1-score": 0.9876543209876543,
         "support": 40.0
     },
-    "accuracy": 0.9972222222222222,
+    "accuracy": 0.9888888888888889,
     "macro avg": {
-        "precision": 0.9972899728997291,
-        "recall": 0.9972222222222222,
-        "f1-score": 0.9972217881266169,
+        "precision": 0.989149964759721,
+        "recall": 0.9888176638176639,
+        "f1-score": 0.9888493503006441,
         "support": 360.0
     },
     "weighted avg": {
-        "precision": 0.997289972899729,
-        "recall": 0.9972222222222222,
-        "f1-score": 0.9972217881266171,
+        "precision": 0.9891499647597208,
+        "recall": 0.9888888888888889,
+        "f1-score": 0.9888854253367193,
         "support": 360.0
-    },
-    "regression_metrics": {
-        "mse": 0.025,
-        "rmse": 0.15811388300841897,
-        "r2_score": 0.9962247618337404,
-        "accuracy": 0.9972222222222222
     }
 }
