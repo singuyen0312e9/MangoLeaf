@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mango Disease AI Diagnostic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f2fe;
+            --secondary: #4facfe;
+            --bg: #0b0e14;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .background-blob {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+            filter: blur(80px);
+            opacity: 0.2;
+            z-index: -1;
+            animation: move 20s infinite alternate;
+        }
+
+        @keyframes move {
+            from { top: -10%; left: -10%; }
+            to { top: 60%; left: 60%; }
+        }
+
+        header {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+            padding-bottom: 50px;
+        }
+
+        .upload-section, .result-section {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px;
+            transition: transform 0.3s;
+        }
+
+        .drop-zone {
+            width: 100%;
+            height: 300px;
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: rgba(0, 242, 254, 0.05);
+        }
+
+        #preview-img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 15px;
+            display: none;
+        }
+
+        .btn-predict {
+            width: 100%;
+            margin-top: 20px;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: black;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-predict:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .result-content { text-align: center; }
+
+        .result-title {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .confidence-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 10px solid var(--glass);
+            border-top: 10px solid var(--primary);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .prob-list {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .prob-item {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .prob-bar {
+            height: 6px;
+            background: var(--glass);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .prob-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 1s ease-out;
+        }
+
+        @media (max-width: 800px) {
+            .container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-blob"></div>
+    <header>
+        <h1>MANGO AI DIAGNOSTIC</h1>
+        <p style="color: #888;">Hệ thống chẩn đoán bệnh xoài thông minh - Phiên bản ShuffleNetV2 Improved</p>
+    </header>
+
+    <div class="container">
+        <!-- Upload -->
+        <div class="upload-section">
+            <div class="drop-zone" id="drop-zone">
+                <div id="drop-text">
+                    <p>Kéo thả ảnh vào đây hoặc nhấp để chọn</p>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 10px;">Hỗ trợ JPG, PNG</p>
+                </div>
+                <img id="preview-img" alt="Preview">
+                <input type="file" id="file-input" hidden accept="image/*">
+            </div>
+            <button class="btn-predict" id="btn-predict" disabled>BẮT ĐẦU CHẨN ĐOÁN</button>
+        </div>
+
+        <!-- Result -->
+        <div class="result-section">
+            <div class="result-content" id="result-placeholder">
+                <p style="color: #666;">Chưa có dữ liệu phân tích</p>
+            </div>
+            <div class="result-content" id="result-display" style="display: none;">
+                <p style="font-size: 0.9rem; color: #888; margin-bottom: 10px;">KẾT QUẢ DỰ ĐOÁN</p>
+                <div class="result-title" id="res-label">Thán thư</div>
+                <div class="confidence-ring" id="res-conf">98%</div>
+                
+                <div class="prob-list" id="prob-list">
+                    <!-- Probability bars will be here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewImg = document.getElementById('preview-img');
+        const dropText = document.getElementById('drop-text');
+        const btnPredict = document.getElementById('btn-predict');
+        const resDisplay = document.getElementById('result-display');
+        const resPlaceholder = document.getElementById('result-placeholder');
+
+        let selectedFile = null;
+
+        dropZone.onclick = () => fileInput.click();
+
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.style.borderColor = "#00f2fe"; };
+        dropZone.ondragleave = () => { dropZone.style.borderColor = "rgba(255, 255, 255, 0.1)"; };
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            handleFile(e.dataTransfer.files[0]);
+        };
+
+        function handleFile(file) {
+            if (!file) return;
+            selectedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+                dropText.style.display = 'none';
+                btnPredict.disabled = false;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        btnPredict.onclick = async () => {
+            if (!selectedFile) return;
+            
+            btnPredict.innerText = "ĐANG PHÂN TÍCH...";
+            btnPredict.disabled = true;
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/predict', { method: 'POST', body: formData });
+                const data = await response.json();
+                
+                showResult(data);
+            } catch (err) {
+                alert("Lỗi kết nối Server!");
+            } finally {
+                btnPredict.innerText = "BẮT ĐẦU CHẨN ĐOÁN";
+                btnPredict.disabled = false;
+            }
+        };
+
+        function showResult(data) {
+            resPlaceholder.style.display = 'none';
+            resDisplay.style.display = 'block';
+            
+            document.getElementById('res-label').innerText = data.prediction;
+            document.getElementById('res-conf').innerText = data.confidence;
+
+            const list = document.getElementById('prob-list');
+            list.innerHTML = '<p style="font-size: 0.8rem; color: #555; margin-bottom: 15px;">CHI TIẾT XÁC SUẤT (%)</p>';
+            
+            Object.entries(data.all_probs).sort((a,b) => parseFloat(b[1]) - parseFloat(a[1])).forEach(([label, prob]) => {
+                const item = document.createElement('div');
+                item.className = 'prob-item';
+                item.innerHTML = `
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>${label}</span>
+                        <span>${prob}</span>
+                    </div>
+                    <div class="prob-bar"><div class="prob-fill" style="width: ${prob}"></div></div>
+                `;
+                list.appendChild(item);
+            });
+        }
+    </script>
+</body>
+</html>
