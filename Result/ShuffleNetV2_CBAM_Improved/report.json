@@ -1,8 +1,8 @@
 {
     "Anthracnose": {
-        "precision": 1.0,
+        "precision": 0.975,
         "recall": 1.0,
-        "f1-score": 1.0,
+        "f1-score": 0.9873417721518988,
         "support": 39.0
     },
     "Bacterial_Canker": {
@@ -12,9 +12,9 @@
         "support": 40.0
     },
     "Bacterial_Spot": {
-        "precision": 0.975609756097561,
+        "precision": 1.0,
         "recall": 1.0,
-        "f1-score": 0.9876543209876543,
+        "f1-score": 1.0,
         "support": 40.0
     },
     "Cutting_Weevil": {
@@ -55,15 +55,18 @@
     },
     "accuracy": 0.9972222222222222,
     "macro avg": {
-        "precision": 0.9972899728997291,
+        "precision": 0.9972222222222222,
         "recall": 0.9972222222222222,
-        "f1-score": 0.9972217881266169,
+        "f1-score": 0.9971870604781997,
         "support": 360.0
     },
     "weighted avg": {
-        "precision": 0.997289972899729,
+        "precision": 0.9972916666666666,
         "recall": 0.9972222222222222,
-        "f1-score": 0.9972217881266171,
+        "f1-score": 0.9972222222222222,
         "support": 360.0
+    },
+    "regression_metrics": {
+        "accuracy": 0.9972222222222222
     }
 }
